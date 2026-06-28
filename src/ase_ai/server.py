@@ -4,6 +4,8 @@ from mcp.server.fastmcp import FastMCP
 
 from ase_ai.config import ASEPRITE_PATH
 from ase_ai.tools.canvas import new_canvas as _new_canvas
+from ase_ai.tools.config_tools import get_default_folder as _get_default_folder
+from ase_ai.tools.config_tools import set_default_folder as _set_default_folder
 from ase_ai.tools.drawing import draw_pixels_batch as _draw_pixels_batch
 from ase_ai.tools.drawing import fill_rect as _fill_rect
 from ase_ai.tools.drawing import flood_fill as _flood_fill
@@ -14,9 +16,13 @@ from ase_ai.tools.export import save_sprite as _save_sprite
 mcp = FastMCP(
     "ase-ai",
     instructions=(
-        "Controls Aseprite via Lua scripts. "
-        "Always use absolute file paths. "
-        f"Aseprite detected at: {ASEPRITE_PATH}"
+        "You control Aseprite via Lua scripts. "
+        "CRITICAL RULES: "
+        "1. Always save files as .aseprite format to disk using your tools — never generate PNG downloads or image artifacts. "
+        "2. When the user does not specify a full path, call get_default_folder() first to find where to save. "
+        "3. Always construct the full save path yourself, e.g. default_folder + '/' + filename + '.aseprite'. "
+        "4. Never ask the user for a path if you can derive it from context or get_default_folder(). "
+        f"Aseprite is at: {ASEPRITE_PATH}"
     ),
 )
 
@@ -112,6 +118,28 @@ def save_sprite(sprite_path: str, output_path: str) -> str:
     if result == "OK":
         return f"Sprite exported to {output_path}"
     return result
+
+
+@mcp.tool()
+def set_default_folder(folder_path: str) -> str:
+    """Set the default folder where sprites are saved when no path is specified.
+
+    Call this once to configure where all future sprites land automatically.
+
+    Args:
+        folder_path: Absolute path to the folder, e.g. "C:/Users/axel/Desktop/sprites"
+    """
+    return _set_default_folder(folder_path)
+
+
+@mcp.tool()
+def get_default_folder() -> str:
+    """Get the current default save folder for sprites.
+
+    Call this whenever the user doesn't specify a path — then build the full path
+    as default_folder + '/' + chosen_filename + '.aseprite'.
+    """
+    return _get_default_folder()
 
 
 @mcp.tool()
