@@ -66,6 +66,41 @@ def flood_fill(sprite_path: str, x: int, y: int, r: int, g: int, b: int, a: int 
     return _run_lua(lua, "flood_fill")
 
 
+def fill_rect(sprite_path: str, x: int, y: int, width: int, height: int, r: int, g: int, b: int, a: int = 255) -> str:
+    """Fill a rectangular area with a solid color — ideal for drawing body parts, backgrounds, and shapes.
+
+    Args:
+        sprite_path: Absolute path to the .aseprite file.
+        x: Left column of the rectangle (0-based).
+        y: Top row of the rectangle (0-based).
+        width: Width of the rectangle in pixels.
+        height: Height of the rectangle in pixels.
+        r: Red channel 0-255.
+        g: Green channel 0-255.
+        b: Blue channel 0-255.
+        a: Alpha channel 0-255. Defaults to 255 (fully opaque).
+    """
+    sprite_path_lua = str(Path(sprite_path).resolve()).replace("\\", "/")
+
+    lua = textwrap.dedent(f"""\
+        local spr = Sprite{{fromFile="{sprite_path_lua}"}}
+        local image = spr.cels[1].image
+        local color = Color{{r={r}, g={g}, b={b}, a={a}}}
+        for row = {y}, {y + height - 1} do
+            for col = {x}, {x + width - 1} do
+                image:putPixel(col, row, color)
+            end
+        end
+        spr:saveAs(spr.filename)
+        app.exit()
+    """)
+
+    result = _run_lua(lua, "fill_rect")
+    if result == "OK":
+        return f"Filled {width}×{height} rect at ({x},{y}) with rgba({r},{g},{b},{a})"
+    return result
+
+
 def draw_pixels_batch(sprite_path: str, pixels: list[dict]) -> str:
     """Draw many pixels in a single Aseprite call — efficient for drawing characters or shapes.
 

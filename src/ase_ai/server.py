@@ -5,6 +5,7 @@ from mcp.server.fastmcp import FastMCP
 from ase_ai.config import ASEPRITE_PATH
 from ase_ai.tools.canvas import new_canvas as _new_canvas
 from ase_ai.tools.drawing import draw_pixels_batch as _draw_pixels_batch
+from ase_ai.tools.drawing import fill_rect as _fill_rect
 from ase_ai.tools.drawing import flood_fill as _flood_fill
 from ase_ai.tools.drawing import paint_pixel as _paint_pixel
 from ase_ai.tools.drawing import read_canvas as _read_canvas
@@ -110,6 +111,40 @@ def save_sprite(sprite_path: str, output_path: str) -> str:
     result = _save_sprite(sprite_path, output_path)
     if result == "OK":
         return f"Sprite exported to {output_path}"
+    return result
+
+
+@mcp.tool()
+def fill_rect(
+    sprite_path: str,
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+    r: int,
+    g: int,
+    b: int,
+    a: int = 255,
+) -> str:
+    """Fill a rectangular area with a solid color.
+
+    Use this for all block-shaped parts: head, torso, legs, arms, backgrounds.
+    Much more efficient and accurate than placing individual pixels for solid areas.
+
+    Args:
+        sprite_path: Absolute path to the .aseprite file.
+        x: Left column of the rectangle (0-based).
+        y: Top row of the rectangle (0-based).
+        width: Width in pixels.
+        height: Height in pixels.
+        r: Red 0-255.
+        g: Green 0-255.
+        b: Blue 0-255.
+        a: Alpha 0-255. Defaults to 255.
+    """
+    result = _fill_rect(sprite_path, x, y, width, height, r, g, b, a)
+    if result.startswith("Filled"):
+        return result
     return result
 
 
