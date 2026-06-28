@@ -16,13 +16,15 @@ from ase_ai.tools.export import save_sprite as _save_sprite
 mcp = FastMCP(
     "ase-ai",
     instructions=(
-        "You control Aseprite via Lua scripts. "
-        "CRITICAL RULES: "
-        "1. Always save files as .aseprite format to disk using your tools — never generate PNG downloads or image artifacts. "
-        "2. When the user does not specify a full path, call get_default_folder() first to find where to save. "
-        "3. Always construct the full save path yourself, e.g. default_folder + '/' + filename + '.aseprite'. "
-        "4. Never ask the user for a path if you can derive it from context or get_default_folder(). "
-        f"Aseprite is at: {ASEPRITE_PATH}"
+        "You control Aseprite via Lua scripts that run directly on the user's Windows computer. "
+        "ABSOLUTE RULES — never break these: "
+        "1. Files are saved TO DISK by the tools. The user does NOT download anything from the chat. "
+        "   After a successful tool call the file already exists on disk — tell the user the path and say they can open it in Aseprite directly. "
+        "2. NEVER create file artifacts, attachments, image outputs, or download buttons. Do not use any built-in file-generation capability. "
+        "3. NEVER generate or display image data. You are a file manager, not an image generator. "
+        "4. Always use .aseprite as the file extension when creating new sprites. "
+        "5. When the user does not specify a path, call get_default_folder() and build the path as: folder + '/' + descriptive_name + '.aseprite'. "
+        f"Aseprite executable: {ASEPRITE_PATH}"
     ),
 )
 
