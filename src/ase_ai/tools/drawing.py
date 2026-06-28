@@ -25,7 +25,7 @@ def paint_pixel(sprite_path: str, x: int, y: int, r: int, g: int, b: int, a: int
         local spr = Sprite{{fromFile="{sprite_path}"}}
         local image = spr.cels[1].image
         image:putPixel({x}, {y}, Color{{r={r}, g={g}, b={b}, a={a}}})
-        spr:save()
+        spr:saveAs(spr.filename)
         app.exit()
     """)
 
@@ -59,7 +59,7 @@ def flood_fill(sprite_path: str, x: int, y: int, r: int, g: int, b: int, a: int 
             image = cel.image,
             points = {{Point({x}, {y})}}
         }}
-        spr:save()
+        spr:saveAs(spr.filename)
         app.exit()
     """)
 
@@ -88,7 +88,7 @@ def draw_pixels_batch(sprite_path: str, pixels: list[dict]) -> str:
         local spr = Sprite{{fromFile="{sprite_path_lua}"}}
         local image = spr.cels[1].image
         {put_calls}
-        spr:save()
+        spr:saveAs(spr.filename)
         app.exit()
     """)
 
