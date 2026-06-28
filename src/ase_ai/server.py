@@ -4,8 +4,10 @@ from mcp.server.fastmcp import FastMCP
 
 from ase_ai.config import ASEPRITE_PATH
 from ase_ai.tools.canvas import new_canvas as _new_canvas
+from ase_ai.tools.drawing import draw_pixels_batch as _draw_pixels_batch
 from ase_ai.tools.drawing import flood_fill as _flood_fill
 from ase_ai.tools.drawing import paint_pixel as _paint_pixel
+from ase_ai.tools.drawing import read_canvas as _read_canvas
 from ase_ai.tools.export import save_sprite as _save_sprite
 
 mcp = FastMCP(
@@ -109,6 +111,37 @@ def save_sprite(sprite_path: str, output_path: str) -> str:
     if result == "OK":
         return f"Sprite exported to {output_path}"
     return result
+
+
+@mcp.tool()
+def draw_pixels_batch(sprite_path: str, pixels: list[dict]) -> str:
+    """Draw many pixels at once in a single Aseprite call — use this for characters, shapes, or any multi-pixel art.
+
+    Much more efficient than calling paint_pixel repeatedly.
+
+    Args:
+        sprite_path: Absolute path to the .aseprite file.
+        pixels: List of pixel objects. Each must have x, y, r, g, b (0-255 ints) and optionally a (alpha, default 255).
+                Example: [{"x": 5, "y": 3, "r": 255, "g": 0, "b": 0}, {"x": 6, "y": 3, "r": 0, "g": 0, "b": 255}]
+    """
+    return _draw_pixels_batch(sprite_path, pixels)
+
+
+@mcp.tool()
+def read_canvas(sprite_path: str, x1: int, y1: int, x2: int, y2: int) -> str:
+    """Read pixel data from a rectangular area of a sprite.
+
+    Returns a shape grid (# = colored, . = transparent) plus a list of each colored pixel's hex value.
+    Use this to inspect what has been drawn and decide what to change next.
+
+    Args:
+        sprite_path: Absolute path to the .aseprite file to read.
+        x1: Left column (0-based, inclusive).
+        y1: Top row (0-based, inclusive).
+        x2: Right column (inclusive).
+        y2: Bottom row (inclusive).
+    """
+    return _read_canvas(sprite_path, x1, y1, x2, y2)
 
 
 def main() -> None:
